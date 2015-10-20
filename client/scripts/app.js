@@ -6,8 +6,11 @@ app.server = 'https://api.parse.com/1/classes/chatterbox/';
     text: "",
     roomname: '8thfloor'
   }
-
-app.addFriend = function (){};
+app.friends = {}; 
+app.addFriend = function (jqueryObject){
+  // app.friends[$(this).text()] = true;
+  console.log(jqueryObject.html());
+};
 
 app.send = function(message){ 
   $.ajax({
@@ -19,6 +22,7 @@ app.send = function(message){
     success: function(data){
       console.log(data);
       app.addMessage(message);
+      $('#textBox').val('').focus();
     }, 
     error: function(errorMsg){console.log(errorMsg);}
   })
@@ -53,8 +57,10 @@ app.addMessage = function(message){
   var message = $('<p><a href="#" class="username">'+message.username+'</a> : ' + message.text+'</p>');
   var msgContainer = $('<div class=\'message\'></div>');
   msgContainer.append(message);
-  $('#chats').append(msgContainer);
-  $('.username').click(app.addFriend);
+  $('#chats').prepend(msgContainer);
+  $('.username').click(function(){
+    app.addFriend($(this));
+  });
 }
 
 app.addRoom = function(room){
@@ -62,17 +68,21 @@ app.addRoom = function(room){
   $('#roomSelect').append('<option class=\'chatRoom\' value='+room+'>'+room+'</option>');
 }
 
-app.handleSubmit = function(event){ 
+app.handleSubmit = function(){ 
   console.log('here');
-    event.preventDefault();
+  debugger; 
     app.send(message);
+    return false; 
     // app.fetch();
 }
 
-  $('#sbmtMsg').click(app.handleSubmit)
+  $('#sbmtMsg').on('click', app.handleSubmit)
 
 
 $('#textBox').on('keyup', function(event){
+  // if(event.which === 13){
+  //   return app.handleSubmit();
+  // }
   message.text = JSON.stringify($('#textBox').val());  
 });
 
@@ -87,8 +97,13 @@ app.safety = {
  '/' :'&#x2F'
 };
 
+
+
 app.verifyInput = function (input){
-  var result = ""; debugger;
+  var result = "";
+  if (input){
+    
+  }
   for (var index=0; index < input.length; ++index){
     if (app.safety.hasOwnProperty(input[index])){
       result += app.safety[input[index]];
